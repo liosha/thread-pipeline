@@ -101,6 +101,7 @@ Block info is a hash containing keys:
     * num_threads - number of parallel threads of worker, default 1
     * out - id of block where processed data should be sent, use '_out' for pipeline's main output
     * main_input - mark this block as default for enqueue
+    * post_sub - code that run when all theads ends
 
 Worker is a sub that will be executed with two params: &worker_sub($data, $pipeline).
 When $data is undefined that means that it is latest data item in sequence.
@@ -138,8 +139,11 @@ sub add_block {
         $threads_num --;
 
         # send undef to next block
-        if ( !$threads_num && $block_info->{out} && $block_info->{out} ne '_out' ) {
-            $self->no_more_data($block_info->{out});
+        if ( !$threads_num ) {
+            $block_info->{post_sub}->()  if $block_info->{post_sub};
+            if ( $block_info->{out} && $block_info->{out} ne '_out' ) {
+                $self->no_more_data($block_info->{out});
+            }
         }
 
         return;

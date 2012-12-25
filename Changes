@@ -1,5 +1,10 @@
 Revision history for Geo-Shapefile-Writer
 
+0.002   December 26, 2012
+        Simplified pipeline description,
+        post_sub
+
+
 0.001   December 25, 2012
         Initial release.
 
