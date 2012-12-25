@@ -44,10 +44,15 @@ use Thread::Queue::Any;
 
 =method new
 
-    my $pl = Thread::Pipeline->new( \%block_descriptions );
+    my $pl = Thread::Pipeline->new( $blocks_description );
 
-Creates pipeline object
-Initializes blocks if defined (see add_block)
+Constructor.
+Creates pipeline object, initializes blocks if defined.
+
+Blocks description is a hashref { $id => $descr, ... }
+or an arrayref [ $id => $lite_descr, ... ] (see add_block).
+For arrayrefs constructor assumes direct block chain
+and automatically adds 'out' fields.
 
 =cut
 
@@ -60,8 +65,17 @@ sub new {
     };
     bless $self, $class;
 
-    while ( my ($id, $info) = each %{ $blocks || {} } ) {
-        $self->add_block( $id => $info );
+    if ( ref $blocks eq 'HASH' ) {
+        while ( my ($id, $info) = each %$blocks ) {
+            $self->add_block( $id => $info );
+        }
+    }
+    elsif ( ref $blocks eq 'ARRAY' ) {
+        for my $i ( 0 .. @$blocks - 1 ) {
+            my %block = %{ $blocks->[$i+1] };
+            $block{out} ||= $blocks->[$i+2] // '_out';
+            $self->add_block( $blocks->[$i] => \%block );
+        }
     }
 
     return $self;
@@ -81,7 +95,7 @@ Add new block to the pipeline.
 Worker threads and associated incoming queue would be created.
 
 Block info is a hash containing keys:
-    * sub (required) - worker coderef 
+    * sub - worker coderef (required)
     * num_threads - number of parallel threads of worker, default 1
     * out - id of block where processed data should be sent, use '_out' for pipeline's main output
     * main_input - mark this block as default for enqueue
