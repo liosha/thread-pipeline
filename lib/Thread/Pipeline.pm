@@ -71,11 +71,12 @@ sub new {
         }
     }
     elsif ( ref $blocks eq 'ARRAY' ) {
-        for my $i ( 0 .. @$blocks - 1 ) {
-            my %block = %{ $blocks->[$i+1] };
+        for my $i ( 0 .. @$blocks/2 - 1 ) {
+            my ( $id, $info, $next_id ) = @$blocks[ $i*2 .. $i*2+2 ];
+            my %block = %$info;
             $block{main_input} //= 1  if $i == 0;
-            $block{out} //= $blocks->[$i+2] // '_out';
-            $self->add_block( $blocks->[$i] => \%block );
+            $block{out} //= $next_id // '_out';
+            $self->add_block( $id => \%block );
         }
     }
 
