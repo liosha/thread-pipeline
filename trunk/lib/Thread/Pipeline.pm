@@ -10,7 +10,7 @@ package Thread::Pipeline;
     my %blocks = (
         map1 => { sub => \&mapper, num_threads => 2, main_input => 1, out => 'map2' },
         map2 => { sub => \&another_mapper, num_threads => 5, out => [ 'log', 'reduce' ] },
-        reduce => { sub => \&reducer, out => '_out' },
+        reduce => { sub => \&reducer, need_finalize => 1, out => '_out' },
         log => { sub => \&logger },
     );
 
@@ -102,6 +102,7 @@ Block info is a hash containing keys:
     * out - id of block where processed data should be sent, use '_out' for pipeline's main output
     * main_input - mark this block as default for enqueue
     * post_sub - code that run when all theads ends
+    * need_finalize - run worker with undef when queue is finished
 
 Worker is a sub that will be executed with two params: &worker_sub($data, $pipeline).
 When $data is undefined that means that it is latest data item in sequence.
@@ -122,9 +123,11 @@ sub add_block {
             # get incoming data block
             my $in_data = $queue->dequeue();
 
-            # process it (even if undefined!)
+            # process it
             # ??? eval?
-            my $out_data = $block_info->{sub}->( $in_data, $self );
+            if ( defined $in_data || $block_info->{need_finalize} ) {
+                my $out_data = $block_info->{sub}->( $in_data, $self );
+            }
 
             # send result to next block
             if ( defined $out_data && $block_info->{out} ) {
