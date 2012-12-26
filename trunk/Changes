@@ -3,6 +3,7 @@ Revision history for Geo-Shapefile-Writer
 0.002   December 26, 2012
         Simplified pipeline description
         'post_sub' and 'need_finalize' worker options
+        tests
 
 
 0.001   December 25, 2012
