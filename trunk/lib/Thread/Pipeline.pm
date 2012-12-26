@@ -125,8 +125,9 @@ sub add_block {
 
             # process it
             # ??? eval?
+            my $out_data;
             if ( defined $in_data || $block_info->{need_finalize} ) {
-                my $out_data = $block_info->{sub}->( $in_data, $self );
+                $out_data = $block_info->{sub}->( $in_data, $self );
             }
 
             # send result to next block
