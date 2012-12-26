@@ -177,6 +177,7 @@ sub enqueue {
     my ($self, $data, %opt) = @_;
 
     my $ids = $opt{block} || $self->{input_ids};
+
     for my $block_id ( @{ ref $ids ? $ids : [$ids]  } ) {
         if ( $block_id eq '_out' ) {
             $self->{out_queue}->enqueue($data);
