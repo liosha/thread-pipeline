@@ -11,7 +11,7 @@ use threads;
 use Thread::Pipeline;
 
 my $p = Thread::Pipeline->new([
-        tid => { sub => sub { return [ threads->tid() => shift ] }, num_threads => 2 },
+        tid => { sub => \&add_tid, num_threads => 2 },
         count => { sub => \&count, need_finalize => 1, },
     ]);
 
@@ -32,6 +32,14 @@ is( scalar keys %$r, 2, 'threads count' );
 
 
 done_testing();
+
+sub add_tid {
+    my ($in) = @_;
+    my $tid = threads->tid();
+
+    sleep 1;
+    return [ $tid => $in ];
+}
 
 sub count {
     my ($in) = @_;

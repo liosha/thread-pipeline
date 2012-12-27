@@ -124,15 +124,18 @@ sub add_block {
             my $in_data = $queue->dequeue();
 
             # process it
-            # ??? eval?
-            my $out_data;
+            my @out_data;
             if ( defined $in_data || $block_info->{need_finalize} ) {
-                $out_data = $block_info->{sub}->( $in_data, $self );
+                eval { @out_data = $block_info->{sub}->( $in_data, $self ); 1 }
+                or carp "Worker '$block_id' died in thread tid=" . threads->tid() . ": $@";
             }
 
-            # send result to next block
-            if ( defined $out_data && $block_info->{out} ) {
-                $self->enqueue( $out_data, block => $block_info->{out} );
+            # send results to next block
+            if ( $block_info->{out} ) {
+                for my $item ( @out_data ) {
+                    next if !defined $item;
+                    $self->enqueue( $item, block => $block_info->{out} );
+                }
             }
 
             # finish work if incoming data was undefined
