@@ -10,7 +10,7 @@ use Test::More;
 use Thread::Pipeline;
 
 my $p = Thread::Pipeline->new([
-        revert => { sub => sub { return [ reverse @{ shift() } ] } },
+        revert => { sub => \&revert },
         concat => { sub => \&concat, need_finalize => 1, },
     ]);
 
@@ -31,6 +31,13 @@ ok( $r ~~ [3,2,1,5,4,6,9,8,7], 'result' );
 
 
 done_testing();
+
+
+sub revert {
+    my ($in) = @_;
+    use YAML; say Dump $in;
+    return [ reverse @$in ];
+}
 
 sub concat {
     my ($in) = @_;
