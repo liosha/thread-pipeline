@@ -40,6 +40,7 @@ use Carp;
 use threads;
 use threads::shared;
 use Thread::Queue::Any 1.12;
+# !!! doesn't work on perl <5.14
 
 
 =method new
@@ -97,9 +98,11 @@ Add new block to the pipeline.
 Worker threads and associated incoming queue would be created.
 
 Block info is a hash containing keys:
+
     * sub - worker coderef (required)
     * num_threads - number of parallel threads of worker, default 1
-    * out - id of block where processed data should be sent, use '_out' for pipeline's main output
+    * out - id of block where processed data should be sent,
+        use '_out' for pipeline's main output
     * main_input - mark this block as default for enqueue
     * post_sub - code that run when all theads ends
     * need_finalize - run worker with undef when queue is finished
@@ -171,7 +174,9 @@ sub add_block {
     $pl->enqueue( $data, %opts );
 
 Puts the data into block's queue
+
 Options:
+
     * block - id of block, default is pipeline's main input block
 
 =cut
