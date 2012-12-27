@@ -3,7 +3,7 @@ Revision history for Geo-Shapefile-Writer
 0.003   December 28, 2012
         eval'ing workers
         workers can return multiple values
-        tests fixed
+        working with old Thread::Queue::Any
 
 0.002   December 26, 2012
         Simplified pipeline description

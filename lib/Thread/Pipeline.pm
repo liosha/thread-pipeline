@@ -39,8 +39,7 @@ use Carp;
 
 use threads;
 use threads::shared;
-use Thread::Queue::Any 1.12;
-# !!! doesn't work on perl <5.14
+use Thread::Queue::Any;
 
 
 =method new
@@ -124,7 +123,7 @@ sub add_block {
     my $thread_sub = sub {
         while (1) {
             # get incoming data block
-            my $in_data = $queue->dequeue();
+            my ($in_data) = $queue->dequeue();
 
             # process it
             my @out_data;
