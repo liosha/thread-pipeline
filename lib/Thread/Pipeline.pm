@@ -39,7 +39,7 @@ use Carp;
 
 use threads;
 use threads::shared;
-use Thread::Queue::Any;
+use Thread::Queue::Any 1.12;
 
 
 =method new
