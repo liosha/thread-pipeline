@@ -102,12 +102,27 @@ Block info is a hash containing keys:
     * num_threads - number of parallel threads of worker, default 1
     * out - id of block where processed data should be sent,
         use '_out' for pipeline's main output
-    * main_input - mark this block as default for enqueue
-    * post_sub - code that run when all theads ends
-    * need_finalize - run worker with undef when queue is finished
+    * main_input - mark this block as default for pipeline's enqueue
+    * post_sub - code that run when all theads of worker ends
+    * need_finalize - run worker one more time with undef after queue has finished
 
-Worker is a sub that will be executed with two params: &worker_sub($data, $pipeline).
-When $data is undefined that means that it is latest data item in sequence.
+Worker is a sub that processes data.
+It is executed for every item in block's queue and receives two parameters: data item and ref to pipeline itself.
+It should return list of data items to be sent to next pipeline block.
+
+    sub worker_sub {
+        my ($data_portion, $pipeline_ref) = @_;
+
+        # if block has 'need_finalize' option
+        if ( !defined $data_portion ) {
+            # ... queue has finished, finalize work
+            return;
+        }
+
+        # ... do anything with data
+        return @out_data_items;
+    }
+
 
 =cut
 
