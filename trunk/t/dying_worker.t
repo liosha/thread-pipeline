@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
+use Carp;
 use Test::More;
 
 use threads;
@@ -12,12 +13,12 @@ use threads::shared;
 use Thread::Pipeline;
 
 my $warn_count :shared = 0;
-$SIG{__WARN__} = sub { $warn_count ++ };
+local $SIG{__WARN__} = sub { $warn_count ++ };
 
 my @data = ( 1 .. 5 );
 
 my $p = Thread::Pipeline->new([
-        die_on_3 => { sub => sub { die if $_[0] eq 3; 1 } },
+        die_on_3 => { sub => sub { croak if $_[0] == 3; 1 } },
     ]);
 
 $p->enqueue($_)  for @data;
