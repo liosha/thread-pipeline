@@ -1,6 +1,9 @@
 Revision history for Geo-Shapefile-Writer
 
 0.003   December 28, 2012
+        documentation and tests fix
+
+0.003   December 28, 2012
         eval'ing workers
         workers can return multiple values
         working with old Thread::Queue::Any

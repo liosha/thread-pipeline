@@ -35,7 +35,6 @@ done_testing();
 
 sub revert {
     my ($in) = @_;
-    use YAML; say Dump $in;
     return [ reverse @$in ];
 }
 
